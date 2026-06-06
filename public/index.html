@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProProxy - Professional Proxy Checker</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Custom scrollbar agar lebih estetik */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-200 min-h-screen font-sans antialiased flex flex-col">
+
+    <div class="container mx-auto px-4 py-10 max-w-6xl flex-grow">
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-black bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent mb-3">
+                ⚡ PROXCHEX
+            </h1>
+            <p class="text-slate-400 text-lg">Uji validitas proxy secara massal dengan kecepatan tinggi.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-[#1e293b] p-6 rounded-2xl shadow-2xl border border-slate-700">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <span class="bg-blue-500 w-2 h-6 rounded-full"></span>
+                        1. Input Data
+                    </h2>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-slate-400 mb-3">Upload File .txt</label>
+                        <div id="dropZone" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-700 border-dashed rounded-xl cursor-pointer bg-[#0f172a] hover:bg-slate-900 hover:border-blue-500 transition-all">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6 pointer-events-none">
+                                <svg class="w-8 h-8 mb-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                <p class="text-xs text-slate-500"><span class="font-bold text-blue-400">Klik untuk upload file</span></p>
+                            </div>
+                            <input type="file" id="fileInput" accept=".txt" class="hidden" />
+                        </div>
+                    </div>
+
+                    <div class="relative flex py-3 items-center mb-4">
+                        <div class="flex-grow border-t border-slate-700"></div>
+                        <span class="flex-shrink mx-4 text-slate-500 text-[10px] uppercase tracking-widest">Atau Tempel</span>
+                        <div class="flex-grow border-t border-slate-700"></div>
+                    </div>
+
+                    <div class="mb-6">
+                        <textarea id="textInput" rows="12" placeholder="IP:PORT&#10;IP:PORT:USER:PASS" class="w-full p-4 bg-[#0f172a] border border-slate-700 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-slate-300 resize-none transition-all"></textarea>
+                    </div>
+
+                    <button id="btnCheck" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition duration-300 shadow-lg shadow-blue-900/20 active:scale-95">
+                        Mulai Pengecekan
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 space-y-6">
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-[#1e293b] p-4 rounded-2xl border border-slate-700 text-center">
+                        <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-1 font-bold">Total</p>
+                        <p id="statTotal" class="text-3xl font-black text-white">0</p>
+                    </div>
+                    <div class="bg-[#1e293b] p-4 rounded-2xl border border-emerald-500/20 text-center">
+                        <p class="text-[10px] uppercase tracking-widest text-emerald-500/70 mb-1 font-bold">Alive</p>
+                        <p id="statAlive" class="text-3xl font-black text-emerald-400">0</p>
+                    </div>
+                    <div class="bg-[#1e293b] p-4 rounded-2xl border border-rose-500/20 text-center">
+                        <p class="text-[10px] uppercase tracking-widest text-rose-500/70 mb-1 font-bold">Dead</p>
+                        <p id="statDead" class="text-3xl font-black text-rose-400">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-[#1e293b] rounded-2xl shadow-2xl border border-slate-700 overflow-hidden flex flex-col min-h-[550px]">
+                    <div class="p-5 border-b border-slate-700 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-[#1e293b]/50 backdrop-blur-sm">
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <span class="bg-emerald-500 w-2 h-6 rounded-full"></span>
+                            2. Live Monitoring
+                        </h2>
+                        
+                        <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+                            <button id="btnDownload" disabled class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold py-2.5 px-3.5 rounded-lg transition duration-300 flex items-center justify-center gap-1">
+                                📥 Download Alive
+                            </button>
+                            <button id="btnCopyAlive" disabled class="bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold py-2.5 px-3.5 rounded-lg transition duration-300 flex items-center justify-center gap-1">
+                                📋 Copy Alive
+                            </button>
+                            
+                            <button id="btnDownloadDead" disabled class="bg-rose-600 hover:bg-rose-500 disabled:bg-slate-800 disabled:text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold py-2.5 px-3.5 rounded-lg transition duration-300 flex items-center justify-center gap-1">
+                                ❌ Download Dead
+                            </button>
+                            <button id="btnCopyDead" disabled class="bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold py-2.5 px-3.5 rounded-lg transition duration-300 flex items-center justify-center gap-1">
+                                📋 Copy Dead
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex-grow overflow-y-auto max-h-[500px] bg-[#0f172a]">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-[#1e293b] sticky top-0 z-10">
+                                <tr>
+                                    <th class="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700">Alamat Proxy</th>
+                                    <th class="p-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 text-center w-32">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultTable" class="text-sm font-mono">
+                                <tr>
+                                    <td colspan="2" class="p-20 text-center text-slate-600 italic font-sans text-sm">
+                                        Silakan masukkan proxy untuk memulai monitor...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="w-full py-6 mt-10 border-t border-slate-800 bg-[#1e293b]/20 backdrop-blur-md text-center">
+        <p class="text-xs tracking-wide text-slate-500 font-medium">
+            &copy; 2026 <span class="text-blue-400 font-bold tracking-wider">IHSAN DEV</span>. All Rights Reserved.
+        </p>
+    </footer>
+
+    <script>
+        let aliveProxiesList = [];
+        let deadProxiesList = [];
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        // Memicu klik file explorer ketika kotak dropZone diklik
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Fitur Baca File .txt
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('textInput').value = e.target.result;
+            };
+            reader.readAsText(file);
+        });
+
+        // Fitur Tombol Check
+        document.getElementById('btnCheck').addEventListener('click', async () => {
+            const rawText = document.getElementById('textInput').value;
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l !== '');
+
+            if (lines.length === 0) {
+                alert('Oops! Masukkan daftar proxy terlebih dahulu.');
+                return;
+            }
+
+            // Reset UI & Data
+            const tableBody = document.getElementById('resultTable');
+            const btnCheck = document.getElementById('btnCheck');
+            
+            tableBody.innerHTML = `<tr><td colspan="2" class="p-20 text-center text-blue-400 animate-pulse font-sans">⚡ Sedang mengecek ${lines.length} proxy secara paralel...</td></tr>`;
+            
+            aliveProxiesList = [];
+            deadProxiesList = [];
+            
+            document.getElementById('statTotal').innerText = lines.length;
+            document.getElementById('statAlive').innerText = '0';
+            document.getElementById('statDead').innerText = '0';
+            
+            // Disable semua tombol aksi saat memproses
+            document.getElementById('btnDownload').disabled = true;
+            document.getElementById('btnCopyAlive').disabled = true;
+            document.getElementById('btnDownloadDead').disabled = true;
+            document.getElementById('btnCopyDead').disabled = true;
+            
+            btnCheck.disabled = true;
+            btnCheck.innerHTML = '<span class="flex items-center justify-center gap-2"><svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...</span>';
+
+            try {
+                const response = await fetch('/api/check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ proxies: lines })
+                });
+                
+                const data = await response.json();
+                
+                // Clear Loading
+                tableBody.innerHTML = '';
+                let aliveCount = 0;
+                let deadCount = 0;
+
+                data.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors";
+                    
+                    if (item.status === 'ALIVE') {
+                        aliveCount++;
+                        aliveProxiesList.push(item.line);
+                        tr.innerHTML = `
+                            <td class="p-4 text-emerald-400/90 font-bold">${item.line}</td>
+                            <td class="p-4 text-center">
+                                <span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-md border border-emerald-500/30 text-[10px] font-black">ALIVE</span>
+                            </td>`;
+                    } else {
+                        deadCount++;
+                        deadProxiesList.push(item.line);
+                        tr.innerHTML = `
+                            <td class="p-4 text-slate-500">${item.line}</td>
+                            <td class="p-4 text-center">
+                                <span class="bg-rose-500/10 text-rose-500 px-3 py-1 rounded-md border border-rose-500/30 text-[10px] font-black">DEAD</span>
+                            </td>`;
+                    }
+                    tableBody.appendChild(tr);
+                });
+
+                // Update Stats Akhir
+                document.getElementById('statAlive').innerText = aliveCount;
+                document.getElementById('statDead').innerText = deadCount;
+                
+                // Aktifkan tombol yang memiliki data
+                if (aliveProxiesList.length > 0) {
+                    document.getElementById('btnDownload').disabled = false;
+                    document.getElementById('btnCopyAlive').disabled = false;
+                }
+                if (deadProxiesList.length > 0) {
+                    document.getElementById('btnDownloadDead').disabled = false;
+                    document.getElementById('btnCopyDead').disabled = false;
+                }
+
+            } catch (error) {
+                console.error(error);
+                tableBody.innerHTML = `<tr><td colspan="2" class="p-20 text-center text-rose-400 font-sans">Gagal terhubung ke server backend. Pastikan server.js sudah dijalankan.</td></tr>`;
+            } finally {
+                btnCheck.disabled = false;
+                btnCheck.innerHTML = 'Mulai Pengecekan';
+            }
+        });
+
+        // Fitur Download Proxy ALIVE
+        document.getElementById('btnDownload').addEventListener('click', () => {
+            if (aliveProxiesList.length === 0) return;
+            const textToSave = aliveProxiesList.join('\n') + '\n';
+            const blob = new Blob([textToSave], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'proxy_aktif.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // Fitur Download Proxy DEAD
+        document.getElementById('btnDownloadDead').addEventListener('click', () => {
+            if (deadProxiesList.length === 0) return;
+            const textToSave = deadProxiesList.join('\n') + '\n';
+            const blob = new Blob([textToSave], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'proxy_mati.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // Fungsi Helper untuk Copy ke Clipboard dengan Efek Teks Sementara
+        function handleCopyAction(buttonElement, dataList) {
+            if (dataList.length === 0) return;
+            const textToCopy = dataList.join('\n') + '\n';
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = buttonElement.innerHTML;
+                buttonElement.innerHTML = '✅ Copied!';
+                buttonElement.classList.remove('bg-slate-700');
+                buttonElement.classList.add('bg-blue-600');
+                
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalText;
+                    buttonElement.classList.remove('bg-blue-600');
+                    buttonElement.classList.add('bg-slate-700');
+                }, 1500);
+            }).catch(err => {
+                console.error('Gagal menyalin teks: ', err);
+            });
+        }
+
+        // Fitur Copy Proxy ALIVE
+        document.getElementById('btnCopyAlive').addEventListener('click', function() {
+            handleCopyAction(this, aliveProxiesList);
+        });
+
+        // Fitur Copy Proxy DEAD
+        document.getElementById('btnCopyDead').addEventListener('click', function() {
+            handleCopyAction(this, deadProxiesList);
+        });
+    </script>
+</body>
+</html>

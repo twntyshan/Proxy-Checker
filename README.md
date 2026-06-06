@@ -1,7 +1,7 @@
 # PROXCHEK
 
 Aplikasi berbasis Node.js untuk melakukan pengecekan daftar proxy secara otomatis.
-
+![preview app](./preview.png)
 ---
 
 ## 🛠️ Prasyarat (Prerequisites)
